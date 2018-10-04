@@ -318,74 +318,85 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void loadCategoriesFromInternet() {
-        Call<CategoriesListModel> categoriesCall = APIClient.getAPIInterface().getCategoriesList();
-        categoriesCall.enqueue(new Callback<CategoriesListModel>() {
-            @Override
-            public void onResponse(@NonNull Call<CategoriesListModel> call,
-                                   @NonNull Response<CategoriesListModel> response) {
-                if (response.isSuccessful() && response.body() != null && mDatabase != null) {
-                    apiCallsRecieved++;
-                    mDatabase.beginTransaction();
-                    mDatabase.where(CategoryModel.class).findAll().deleteAllFromRealm();
-                    mDatabase.copyToRealmOrUpdate(response.body().getCategoriesList());
-                    mDatabase.commitTransaction();
-                    categoriesDataAvailableLocally = true;
-                    Log.d("TAG", "Categories");
+        try {
+            Call<CategoriesListModel> categoriesCall = APIClient.getAPIInterface().getCategoriesList();
+            categoriesCall.enqueue(new Callback<CategoriesListModel>() {
+                @Override
+                public void onResponse(@NonNull Call<CategoriesListModel> call,
+                                       @NonNull Response<CategoriesListModel> response) {
+                    if (response.isSuccessful() && response.body() != null && mDatabase != null) {
+                        apiCallsRecieved++;
+                        mDatabase.beginTransaction();
+                        mDatabase.where(CategoryModel.class).findAll().deleteAllFromRealm();
+                        mDatabase.copyToRealmOrUpdate(response.body().getCategoriesList());
+                        mDatabase.commitTransaction();
+                        categoriesDataAvailableLocally = true;
+                        Log.d("TAG", "Categories");
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<CategoriesListModel> call, @NonNull Throwable t) {
+                @Override
+                public void onFailure(@NonNull Call<CategoriesListModel> call, @NonNull Throwable t) {
 
-            }
-        });
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void loadSchedulesFromInternet() {
-        Call<ScheduleListModel> schedulesCall = APIClient.getAPIInterface().getScheduleList();
-        schedulesCall.enqueue(new Callback<ScheduleListModel>() {
-            @Override
-            public void onResponse(@NonNull Call<ScheduleListModel> call, @NonNull Response<ScheduleListModel> response) {
-                if (response.isSuccessful() && response.body() != null && mDatabase != null) {
-                    apiCallsRecieved++;
-                    mDatabase.beginTransaction();
-                    mDatabase.where(ScheduleModel.class).findAll().deleteAllFromRealm();
-                    mDatabase.copyToRealm(response.body().getData());
-                    mDatabase.commitTransaction();
-                    schedulesDataAvailableLocally = true;
-                    Log.d(TAG, "Schedules");
+        try {
+            Call<ScheduleListModel> schedulesCall = APIClient.getAPIInterface().getScheduleList();
+            schedulesCall.enqueue(new Callback<ScheduleListModel>() {
+                @Override
+                public void onResponse(@NonNull Call<ScheduleListModel> call, @NonNull Response<ScheduleListModel> response) {
+                    if (response.isSuccessful() && response.body() != null && mDatabase != null) {
+                        apiCallsRecieved++;
+                        mDatabase.beginTransaction();
+                        mDatabase.where(ScheduleModel.class).findAll().deleteAllFromRealm();
+                        mDatabase.copyToRealm(response.body().getData());
+                        mDatabase.commitTransaction();
+                        schedulesDataAvailableLocally = true;
+                        Log.d(TAG, "Schedules");
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<ScheduleListModel> call, @NonNull Throwable t) {
-                apiCallsRecieved++;
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<ScheduleListModel> call, @NonNull Throwable t) {
+                    apiCallsRecieved++;
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void loadEventsFromInternet() {
-
-        Call<EventsListModel> eventsCall = APIClient.getAPIInterface().getEventsList();
-        eventsCall.enqueue(new Callback<EventsListModel>() {
-            @Override
-            public void onResponse(@NonNull Call<EventsListModel> call, @NonNull Response<EventsListModel> response) {
-                if (response.isSuccessful() && response.body() != null && mDatabase != null) {
-                    apiCallsRecieved++;
-                    mDatabase.beginTransaction();
-                    mDatabase.where(EventDetailsModel.class).findAll().deleteAllFromRealm();
-                    mDatabase.copyToRealmOrUpdate(response.body().getEvents());
-                    mDatabase.commitTransaction();
-                    eventsDataAvailableLocally = true;
-                    Log.d("TAG", "Events");
+        try {
+            Call<EventsListModel> eventsCall = APIClient.getAPIInterface().getEventsList();
+            eventsCall.enqueue(new Callback<EventsListModel>() {
+                @Override
+                public void onResponse(@NonNull Call<EventsListModel> call, @NonNull Response<EventsListModel> response) {
+                    if (response.isSuccessful() && response.body() != null && mDatabase != null) {
+                        apiCallsRecieved++;
+                        mDatabase.beginTransaction();
+                        mDatabase.where(EventDetailsModel.class).findAll().deleteAllFromRealm();
+                        mDatabase.copyToRealmOrUpdate(response.body().getEvents());
+                        mDatabase.commitTransaction();
+                        eventsDataAvailableLocally = true;
+                        Log.d("TAG", "Events");
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<EventsListModel> call, @NonNull Throwable t) {
-                apiCallsRecieved++;
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<EventsListModel> call, @NonNull Throwable t) {
+                    apiCallsRecieved++;
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 

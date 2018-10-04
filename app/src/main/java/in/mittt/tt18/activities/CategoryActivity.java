@@ -60,7 +60,7 @@ public class CategoryActivity extends AppCompatActivity implements CategoryEvent
     }
     private void registerForEvent(String eventID){
         Log.d(TAG, "registerForEvent: called");
-        final ProgressDialog dialog = new ProgressDialog(getBaseContext());
+        final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage("Trying to register you for event... please wait!");
         dialog.setCancelable(false);
         dialog.show();
@@ -89,7 +89,7 @@ public class CategoryActivity extends AppCompatActivity implements CategoryEvent
 
     }
     public void showAlert(String message) {
-        new AlertDialog.Builder(getBaseContext()).setIcon(R.drawable.ic_info).setTitle("Info").setMessage(message)
+        new AlertDialog.Builder(this).setIcon(R.drawable.ic_info).setTitle("Info").setMessage(message)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

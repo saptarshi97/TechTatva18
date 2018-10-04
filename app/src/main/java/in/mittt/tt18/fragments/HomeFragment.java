@@ -519,10 +519,8 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onResponse(@NonNull Call<ResultsListModel> call, @NonNull Response<ResultsListModel> response) {
-                    if (response.isSuccessful() && response.body() != null) {
+                    if (response.isSuccessful() && response.body() != null && mDatabase!=null) {
                         results = response.body().getData();
-                        if(mDatabase==null)
-                            mDatabase = Realm.getDefaultInstance();
                         mDatabase.beginTransaction();
                         mDatabase.where(ResultModel.class).findAll().deleteAllFromRealm();
                         mDatabase.copyToRealm(results);
@@ -637,7 +635,7 @@ public class HomeFragment extends Fragment {
              updateDialog.setIcon(R.drawable.ic_success);
              updateDialog.setTitle("What's new");
              updateDialog.setCancelable(false);
-             updateDialog.setMessage("You can now register for events by long pressing on an event");
+             updateDialog.setMessage("You can now register for events in-app without QR by long pressing on an event !");
              updateDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Ok", new DialogInterface.OnClickListener() {
                  @Override
                  public void onClick(DialogInterface dialog, int which) {
