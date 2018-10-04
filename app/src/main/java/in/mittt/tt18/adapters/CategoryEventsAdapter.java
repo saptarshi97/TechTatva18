@@ -46,17 +46,20 @@ public class CategoryEventsAdapter extends RecyclerView.Adapter<CategoryEventsAd
     private FragmentActivity activity;
     private Context context;
     EventModel event;
-
+    private EventLongPressListener longPressListener;
     private Realm realm = Realm.getDefaultInstance();
     private RealmResults<FavouritesModel> favouritesRealm = realm.where(FavouritesModel.class).findAll();
     private List<FavouritesModel> favourites = realm.copyFromRealm(favouritesRealm);
 
-
-    public CategoryEventsAdapter(List<EventModel> eventsList, FragmentActivity activity, Context context, boolean isRevels) {
+    public interface EventLongPressListener{
+        public void onItemLongPress(EventModel event);
+    }
+    public CategoryEventsAdapter(List<EventModel> eventsList, FragmentActivity activity, Context context, boolean isRevels, EventLongPressListener longPressListener) {
         this.eventsList = eventsList;
         this.activity = activity;
         this.context = context;
         this.isRevels = isRevels;
+        this.longPressListener = longPressListener;
     }
 
     @NonNull
@@ -83,6 +86,7 @@ public class CategoryEventsAdapter extends RecyclerView.Adapter<CategoryEventsAd
         } else {
             holder.eventRound.setVisibility(View.GONE);
         }
+
     }
     @Override
     public int getItemCount() {
@@ -266,6 +270,14 @@ public class CategoryEventsAdapter extends RecyclerView.Adapter<CategoryEventsAd
             eventRound = itemView.findViewById(R.id.cat_event_round_text_view);
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final EventModel event = eventsList.get(getLayoutPosition());
+                    longPressListener.onItemLongPress(event);
+                    return true;
+                }
+            });
             Log.d(TAG, "CategoryEventsViewHolder: set listener ");
         }
 

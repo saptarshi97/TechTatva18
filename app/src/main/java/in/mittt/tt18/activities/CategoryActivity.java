@@ -1,8 +1,11 @@
 package in.mittt.tt18.activities;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,10 +29,17 @@ import in.mittt.tt18.adapters.CategoryEventsAdapter;
 import in.mittt.tt18.models.events.EventDetailsModel;
 import in.mittt.tt18.models.events.EventModel;
 import in.mittt.tt18.models.events.ScheduleModel;
+import in.mittt.tt18.models.registration.EventRegistrationResponse;
+import in.mittt.tt18.network.RegistrationClient;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class CategoryActivity extends AppCompatActivity {
+public class CategoryActivity extends AppCompatActivity implements CategoryEventsAdapter.EventLongPressListener{
 
     private String catName;
     private String cat_id;
@@ -45,6 +55,48 @@ public class CategoryActivity extends AppCompatActivity {
     private List<ScheduleModel> scheduleResults;
     private String TAG = "CategoryActivity";
 
+    public void onItemLongPress(EventModel event){
+        registerForEvent(event.getEventId());
+    }
+    private void registerForEvent(String eventID){
+        Log.d(TAG, "registerForEvent: called");
+        final ProgressDialog dialog = new ProgressDialog(getBaseContext());
+        dialog.setMessage("Trying to register you for event... please wait!");
+        dialog.setCancelable(false);
+        dialog.show();
+        RequestBody body =  RequestBody.create(MediaType.parse("text/plain"), "eventid="+eventID);
+        Call<EventRegistrationResponse> call = RegistrationClient.getRegistrationInterface(getBaseContext()).eventReg(RegistrationClient.generateCookie(getBaseContext()),body);
+        call.enqueue(new Callback<EventRegistrationResponse>() {
+            @Override
+            public void onResponse(Call<EventRegistrationResponse> call, Response<EventRegistrationResponse> response) {
+                dialog.cancel();
+                if (response != null && response.body() != null){
+                    try {
+                        showAlert(response.body().getMessage());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }else{
+                    showAlert("Error! Please try again.");
+                }
+            }
+            @Override
+            public void onFailure(Call<EventRegistrationResponse> call, Throwable t) {
+                dialog.cancel();
+                showAlert("Error connecting to server! Please try again.");
+            }
+        });
+
+    }
+    public void showAlert(String message) {
+        new AlertDialog.Builder(getBaseContext()).setIcon(R.drawable.ic_info).setTitle("Info").setMessage(message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                }).setCancelable(true).show();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,7 +221,7 @@ public class CategoryActivity extends AppCompatActivity {
             recyclerViewDay1.setVisibility(View.GONE);
         }
         else{
-            recyclerViewDay1.setAdapter(new CategoryEventsAdapter(day1List, this, getBaseContext(), true));
+            recyclerViewDay1.setAdapter(new CategoryEventsAdapter(day1List, this, getBaseContext(), true, this));
             recyclerViewDay1.setNestedScrollingEnabled(false);
             recyclerViewDay1.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         }
@@ -180,7 +232,7 @@ public class CategoryActivity extends AppCompatActivity {
             recyclerViewDay2.setVisibility(View.GONE);
         }
         else{
-            recyclerViewDay2.setAdapter(new CategoryEventsAdapter(day2List, this, getBaseContext(), true));
+            recyclerViewDay2.setAdapter(new CategoryEventsAdapter(day2List, this, getBaseContext(), true, this));
             recyclerViewDay2.setNestedScrollingEnabled(false);
             recyclerViewDay2.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         }
@@ -191,7 +243,7 @@ public class CategoryActivity extends AppCompatActivity {
             recyclerViewDay3.setVisibility(View.GONE);
         }
         else {
-            recyclerViewDay3.setAdapter(new CategoryEventsAdapter(day3List, this, getBaseContext(), true));
+            recyclerViewDay3.setAdapter(new CategoryEventsAdapter(day3List, this, getBaseContext(), true, this));
             recyclerViewDay3.setNestedScrollingEnabled(false);
             recyclerViewDay3.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         }
@@ -202,7 +254,7 @@ public class CategoryActivity extends AppCompatActivity {
             recyclerViewDay4.setVisibility(View.GONE);
         }
         else {
-            recyclerViewDay4.setAdapter(new CategoryEventsAdapter(day4List, this, getBaseContext(), true));
+            recyclerViewDay4.setAdapter(new CategoryEventsAdapter(day4List, this, getBaseContext(), true, this));
             recyclerViewDay4.setNestedScrollingEnabled(false);
             recyclerViewDay4.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         }

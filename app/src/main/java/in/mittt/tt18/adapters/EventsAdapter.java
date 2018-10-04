@@ -247,6 +247,18 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
 
         final View view = View.inflate(context, R.layout.event_dialog_info, null);
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(view.getContext());
+        if(!sp.getBoolean("displayedLongPressHint",false)){
+            Snackbar.make(view, "HINT:Long press on an event to register for it!", Snackbar.LENGTH_LONG)
+                    .setAction("Got It!", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            sp.edit().putBoolean("displayedLongPressHint", true);
+                            sp.edit().apply();
+                        }
+                    })
+                    .show();
+        }
         final Dialog dialog = new Dialog(context);
         TabbedDialog td = new TabbedDialog();
         final String eventID = event.getEventId();
@@ -335,7 +347,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
                 public void onClick(View view) {
                     Log.i(TAG, "onClick: Event clicked" + event.getEventName());
                     displayEventDialog(event, view.getContext());
-
                 }
             });
             container.setOnLongClickListener(new View.OnLongClickListener() {
